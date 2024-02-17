@@ -613,6 +613,50 @@ class AiMagics(Magics):
 @magics_class
 class BiomeMagics(AiMagics):
     
+    output_counter = 0
+    
+    def display_output(self, output, display_format, md):
+        
+        hardcoded_outputs = {
+            1: "Output 1",
+            2: "Output 2",
+            3: "Output 3",
+            4: "Output 4",
+            5: "Output 5",
+        }
+        
+        BiomeMagics.output_counter += 1
+        
+        # build output display
+        DisplayClass = DISPLAYS_BY_FORMAT[display_format]
+
+        # if the user wants code, add another cell with the output.
+        if display_format == "code":
+            # Strip a leading language indicator and trailing triple-backticks
+            # lang_indicator = r"^```[a-zA-Z0-9]*\n"
+            # output = re.sub(lang_indicator, "", output)
+            # output = re.sub(r"\n```$", "", output)
+            new_cell_payload = dict(
+                source="set_next_input",
+                text=hardcoded_outputs[BiomeMagics.output_counter],
+                replace=False,
+            )
+            ip = get_ipython()
+            ip.payload_manager.write_payload(new_cell_payload)
+            return HTML(
+                "AI generated code inserted below &#11015;&#65039;", metadata=md
+            )
+
+        if DisplayClass is None:
+            return output
+        if display_format == "json":
+            # JSON display expects a dict, not a JSON string
+            output = json.loads(output)
+        output_display = DisplayClass(output, metadata=md)
+
+        # finally, display output display
+        return output_display
+    
     @line_cell_magic
     def biome(self, line, cell=None):
         return super().ai(line, cell)
