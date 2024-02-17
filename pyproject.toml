@@ -22,6 +22,9 @@ text = "BSD 3-Clause License"
 source = "nodejs"
 path = "package.json"
 
+[tool.hatch.build.targets.wheel]
+packages = ["packages/jupyter-ai", "packages/jupyter-ai-magics"]
+
 [tool.check-manifest]
 ignore = [".*"]
 

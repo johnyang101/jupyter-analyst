@@ -544,16 +544,16 @@ class AiMagics(Magics):
         provider = Provider(**provider_params, **model_parameters)
 
         # Apply a prompt template.
-        prompt = provider.get_prompt_template(args.format).format(prompt=prompt)
+        prompt = provider.get_prompt_template(args.format).format(prompt=prompt) #TODO: Understand
 
         # interpolate user namespace into prompt
         ip = get_ipython()
-        prompt = prompt.format_map(FormatDict(ip.user_ns))
+        prompt = prompt.format_map(FormatDict(ip.user_ns)) #TODO: Understand
 
         if provider.is_chat_provider:
             result = provider.generate([[HumanMessage(content=prompt)]])
         else:
-            # generate output from model via provider
+            # generate output from model via provider #TODO: What's the difference here?
             result = provider.generate([prompt])
 
         output = result.generations[0][0].text
@@ -609,3 +609,10 @@ class AiMagics(Magics):
         prompt = prompt.format_map(FormatDict(ip.user_ns))
 
         return self.run_ai_cell(args, prompt)
+
+@magics_class
+class BiomeMagics(AiMagics):
+    
+    @line_cell_magic
+    def biome(self, line, cell=None):
+        return super().ai(line, cell)

@@ -20,6 +20,7 @@ ui-tests/playwright-report/
 __pycache__/
 *.py[cod]
 *$py.class
+.hardcode/
 
 # C extensions
 *.so

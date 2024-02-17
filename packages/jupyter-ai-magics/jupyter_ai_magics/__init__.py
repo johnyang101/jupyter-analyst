@@ -11,7 +11,7 @@ from .embedding_providers import (
     QianfanEmbeddingsEndpointProvider,
 )
 from .exception import store_exception
-from .magics import AiMagics
+from .magics import AiMagics, BiomeMagics
 
 # expose model providers on the package root
 from .providers import (
@@ -34,6 +34,7 @@ from .providers import (
 
 def load_ipython_extension(ipython):
     ipython.register_magics(AiMagics)
+    ipython.register_magics(BiomeMagics)
     ipython.set_custom_exc((BaseException,), store_exception)
 
 
