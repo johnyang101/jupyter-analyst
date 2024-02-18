@@ -69,6 +69,34 @@ const plugin: JupyterFrontEndPlugin<void> = {
     if (restorer) {
       restorer.add(chatWidget, 'jupyter-ai-chat');
     }
+
+    // Add the new command for the biome magic
+    app.commands.addCommand('runmagic:biome', {
+      label: 'Run Biome Magic',
+      execute: () => {
+        const current = app.shell.currentWidget;
+        if (current && current instanceof NotebookPanel) {
+          const notebook = current.content;
+          const activeCell = notebook.activeCell;
+          if (activeCell && activeCell.model.type === 'code') {
+            const editor = activeCell.editor;
+            const currentCode = editor.model.value.text;
+            const magicCode = `%%biome\n${currentCode}`;
+            editor.model.value.text = magicCode;
+            notebook.context.save().then(() => {
+              NotebookActions.run(notebook, notebook.sessionContext);
+            });
+          }
+        }
+      }
+    });
+
+    // Add the keyboard shortcut for the command
+    app.commands.addKeyBinding({
+      command: 'runmagic:biome',
+      keys: ['Accel B'],
+      selector: '.jp-Notebook.jp-mod-editMode'
+    });
   }
 };
 
