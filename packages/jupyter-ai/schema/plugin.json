@@ -41,6 +41,15 @@
       }
     ]
   },
+  "shortcuts": [
+    {
+      "command": "runmagic:biome",
+      "keys": [
+        "Accel Shift Enter"
+      ],
+      "selector": ".jp-Notebook.jp-mod-editMode"
+    }
+  ],
   "additionalProperties": false,
   "type": "object"
 }

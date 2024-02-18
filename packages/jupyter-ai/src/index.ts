@@ -19,6 +19,8 @@ import { buildErrorWidget } from './widgets/chat-error';
 import { completionPlugin } from './completions';
 import { statusItemPlugin } from './status';
 import { IRenderMimeRegistry } from '@jupyterlab/rendermime';
+import { NotebookActions, NotebookPanel } from '@jupyterlab/notebook';
+import { ICommandPalette } from '@jupyterlab/apputils';
 
 export type DocumentTracker = IWidgetTracker<IDocumentWidget>;
 
@@ -28,14 +30,15 @@ export type DocumentTracker = IWidgetTracker<IDocumentWidget>;
 const plugin: JupyterFrontEndPlugin<void> = {
   id: 'jupyter_ai:plugin',
   autoStart: true,
-  optional: [IGlobalAwareness, ILayoutRestorer, IThemeManager],
+  optional: [IGlobalAwareness, ILayoutRestorer, IThemeManager, ICommandPalette],
   requires: [IRenderMimeRegistry],
   activate: async (
     app: JupyterFrontEnd,
     rmRegistry: IRenderMimeRegistry,
     globalAwareness: Awareness | null,
     restorer: ILayoutRestorer | null,
-    themeManager: IThemeManager | null
+    themeManager: IThemeManager | null,
+    palette: ICommandPalette
   ) => {
     /**
      * Initialize selection watcher singleton
@@ -70,10 +73,19 @@ const plugin: JupyterFrontEndPlugin<void> = {
       restorer.add(chatWidget, 'jupyter-ai-chat');
     }
 
+    //palette must be initialized
+    console.log('Adding command to palette');
+    palette.addItem({
+      command: 'runmagic:biome',
+      category: 'Extension Commands',
+      rank: 10
+    });
+
     // Add the new command for the biome magic
     app.commands.addCommand('runmagic:biome', {
       label: 'Run Biome Magic',
       execute: () => {
+        console.log('Running Biome Magic');
         const current = app.shell.currentWidget;
         if (current && current instanceof NotebookPanel) {
           const notebook = current.content;
@@ -94,7 +106,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
     // Add the keyboard shortcut for the command
     app.commands.addKeyBinding({
       command: 'runmagic:biome',
-      keys: ['Accel B'],
+      keys: ['Accel Shift Enter'],
       selector: '.jp-Notebook.jp-mod-editMode'
     });
   }
