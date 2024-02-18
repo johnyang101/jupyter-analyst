@@ -1,6 +1,6 @@
 play/
 
-*.bundle.* 
+*.bundle.*
 lib/
 node_modules/
 *.log

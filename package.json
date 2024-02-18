@@ -46,5 +46,9 @@
   },
   "nx": {
     "includedScripts": []
+  },
+  "dependencies": {
+    "@jupyterlab/application": "^4.1.1",
+    "@jupyterlab/apputils": "^4.2.1"
   }
 }

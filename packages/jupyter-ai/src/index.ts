@@ -18,6 +18,7 @@ import { ChatHandler } from './chat_handler';
 import { buildErrorWidget } from './widgets/chat-error';
 import { completionPlugin } from './completions';
 import { statusItemPlugin } from './status';
+import { biomePlugin } from './biome';
 import { IRenderMimeRegistry } from '@jupyterlab/rendermime';
 
 export type DocumentTracker = IWidgetTracker<IDocumentWidget>;
@@ -37,6 +38,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
     restorer: ILayoutRestorer | null,
     themeManager: IThemeManager | null
   ) => {
+    console.log('Jupyter AI extension is activated!');
     /**
      * Initialize selection watcher singleton
      */
@@ -72,4 +74,4 @@ const plugin: JupyterFrontEndPlugin<void> = {
   }
 };
 
-export default [plugin, statusItemPlugin, completionPlugin];
+export default [plugin, statusItemPlugin, completionPlugin, biomePlugin];
