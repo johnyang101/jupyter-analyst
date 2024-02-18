@@ -5,16 +5,18 @@ import {
 
 import { NotebookActions, NotebookPanel } from '@jupyterlab/notebook';
 import { ICommandPalette } from '@jupyterlab/apputils';
+import { ISettingRegistry } from '@jupyterlab/settingregistry';
 
 /**
  * Initialization data for the jupyter_ai extension.
  */
 export const biomePlugin: JupyterFrontEndPlugin<void> = {
-  id: 'biome:magic_ks',
+  id: 'jupyter_ai:magic_ks',
   autoStart: true,
   optional: [],
-  requires: [ICommandPalette],
+  requires: [ICommandPalette, ISettingRegistry],
   activate: async (app: JupyterFrontEnd, palette: ICommandPalette) => {
+    console.log('Biome AI plugin is activated!');
     const runBiomeCommandID = 'runmagic:biome';
 
     // Add the new command for the biome magic
@@ -32,7 +34,8 @@ export const biomePlugin: JupyterFrontEndPlugin<void> = {
             if (editor) {
               // Access the text value safely
               const currentCode = editor.model.sharedModel.getSource();
-              const magicCode = `%%biome\n${currentCode}`;
+              console.log('Current code:', currentCode);
+              const magicCode = `%%biome chatgpt\n${currentCode}`;
               editor.model.sharedModel.setSource(magicCode);
               // Save the notebook and run the cell
               current.context.save().then(() => {

@@ -38,6 +38,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
     restorer: ILayoutRestorer | null,
     themeManager: IThemeManager | null
   ) => {
+    console.log('Jupyter AI extension is activated!');
     /**
      * Initialize selection watcher singleton
      */
