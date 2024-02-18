@@ -41,7 +41,7 @@
       }
     ]
   },
-  "shortcuts": [
+  "jupyter.lab.shortcuts": [
     {
       "command": "runmagic:biome",
       "keys": [

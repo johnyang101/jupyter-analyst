@@ -1,3 +1,5 @@
+play/
+
 *.bundle.*
 lib/
 node_modules/
