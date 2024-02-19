@@ -16,6 +16,8 @@ from jupyter_ai_magics.utils import decompose_model_id, get_lm_providers
 from langchain.chains import LLMChain
 from langchain.schema import HumanMessage
 
+from jupyter_ai_magics.hc import hardcoded_outputs
+
 from .parsers import (
     CellArgs,
     DeleteArgs,
@@ -613,22 +615,33 @@ class AiMagics(Magics):
 @magics_class
 class BiomeMagics(AiMagics):
     
+    HARDCODE = True
     output_counter = 0
     
-    def display_output(self, output, display_format, md):
-        
-        hardcoded_outputs = {
-            1: "Output 1",
-            2: "Output 2",
-            3: "Output 3",
-            4: "Output 4",
-            5: "Output 5",
-        }
-        
-        BiomeMagics.output_counter += 1
-        
+    def display_output(self, output, display_format, md):        
         # build output display
         DisplayClass = DISPLAYS_BY_FORMAT[display_format]
+        
+        if BiomeMagics.HARDCODE:
+            
+            DisplayClass = DISPLAYS_BY_FORMAT["md"]
+            
+            output = hardcoded_outputs[BiomeMagics.output_counter]
+            BiomeMagics.output_counter += 1
+            
+            text, code = output.split(";")
+            
+            new_cell_payload = dict(
+                source="set_next_input",
+                text=code,
+                replace=False,
+            )
+            
+            ip = get_ipython()
+            ip.payload_manager.write_payload(new_cell_payload)
+            if text == '':
+                return None
+            return DisplayClass(text, metadata=md)
 
         # if the user wants code, add another cell with the output.
         if display_format == "code":
@@ -643,7 +656,7 @@ class BiomeMagics(AiMagics):
             )
             ip = get_ipython()
             ip.payload_manager.write_payload(new_cell_payload)
-            return HTML(
+            return HTML( #TODO: Remove 
                 "AI generated code inserted below &#11015;&#65039;", metadata=md
             )
 
