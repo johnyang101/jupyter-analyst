@@ -12,10 +12,10 @@ class CodeCell(Cell):
         self.source = source
         self.replace = replace
         
-    def parse(self):
-        lines = self.content.split('\n')
+    def parse(self, content):
+        lines = content.split('\n')
         parsed_lines = [line.strip() for line in lines if line.strip() != '']
-        return '\\n'.join(parsed_lines)
+        return '\n'.join(parsed_lines)
     
 class MarkdownCell(Cell):
 
