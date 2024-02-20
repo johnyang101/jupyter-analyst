@@ -612,63 +612,107 @@ class AiMagics(Magics):
 
         return self.run_ai_cell(args, prompt)
 
+temp = ['md', 'What would you like to do next?'],
 @magics_class
 class BiomeMagics(AiMagics):
     
+    # HARDCODE = True
+    # output_counter = 0
+    
+    # def display_output(self, output, md):        
+    #     # build output display
+    #     display_format  = hardcoded_outputs[BiomeMagics.output_counter][0]
+    #     DisplayClass = DISPLAYS_BY_FORMAT[display_format]
+        
+    #     if BiomeMagics.HARDCODE:
+            
+    #         DisplayClass = DISPLAYS_BY_FORMAT["md"]
+            
+    #         output = hardcoded_outputs[BiomeMagics.output_counter]
+    #         BiomeMagics.output_counter += 1
+            
+    #         text, code = output.split(";")
+            
+    #         new_cell_payload = dict(
+    #             source="set_next_input",
+    #             text=code,
+    #             replace=False,
+    #         )
+            
+    #         ip = get_ipython()
+    #         ip.payload_manager.write_payload(new_cell_payload)
+    #         if text == '':
+    #             return None
+    #         return DisplayClass(text, metadata=md)
+
+    #     # if the user wants code, add another cell with the output.
+    #     if display_format == "code":
+    #         # Strip a leading language indicator and trailing triple-backticks
+    #         # lang_indicator = r"^```[a-zA-Z0-9]*\n"
+    #         # output = re.sub(lang_indicator, "", output)
+    #         # output = re.sub(r"\n```$", "", output)
+    #         new_cell_payload = dict(
+    #             source="set_next_input",
+    #             text=hardcoded_outputs[BiomeMagics.output_counter],
+    #             replace=False,
+    #         )
+    #         ip = get_ipython()
+    #         ip.payload_manager.write_payload(new_cell_payload)
+    #         return HTML( #TODO: Remove 
+    #             "AI generated code inserted below &#11015;&#65039;", metadata=md
+    #         )
+
+    #     if DisplayClass is None:
+    #         return output
+    #     if display_format == "json":
+    #         # JSON display expects a dict, not a JSON string
+    #         output = json.loads(output)
+    #     output_display = DisplayClass(output, metadata=md)
+
+    #     # finally, display output display
+    #     return output_display
+
     HARDCODE = True
     output_counter = 0
-    
-    def display_output(self, output, display_format, md):        
-        # build output display
-        DisplayClass = DISPLAYS_BY_FORMAT[display_format]
-        
+
+    def display_output(self, output, display_type, md):
+        # Check if we are using hardcoded outputs
         if BiomeMagics.HARDCODE:
-            
-            DisplayClass = DISPLAYS_BY_FORMAT["md"]
-            
-            output = hardcoded_outputs[BiomeMagics.output_counter]
+            # Get the current output format and content from the hardcoded list
+            current_output = hardcoded_outputs[BiomeMagics.output_counter]
             BiomeMagics.output_counter += 1
-            
-            text, code = output.split(";")
-            
-            new_cell_payload = dict(
-                source="set_next_input",
-                text=code,
-                replace=False,
-            )
-            
-            ip = get_ipython()
-            ip.payload_manager.write_payload(new_cell_payload)
-            if text == '':
-                return None
-            return DisplayClass(text, metadata=md)
 
-        # if the user wants code, add another cell with the output.
-        if display_format == "code":
-            # Strip a leading language indicator and trailing triple-backticks
-            # lang_indicator = r"^```[a-zA-Z0-9]*\n"
-            # output = re.sub(lang_indicator, "", output)
-            # output = re.sub(r"\n```$", "", output)
-            new_cell_payload = dict(
-                source="set_next_input",
-                text=hardcoded_outputs[BiomeMagics.output_counter],
-                replace=False,
-            )
-            ip = get_ipython()
-            ip.payload_manager.write_payload(new_cell_payload)
-            return HTML( #TODO: Remove 
-                "AI generated code inserted below &#11015;&#65039;", metadata=md
-            )
+            display_format, content = current_output
+            DisplayClass = DISPLAYS_BY_FORMAT.get("md", None)  # Default to Markdown for display
+            
+            if display_format == "code":
+                # For code, perform the special handling as in the original code
+                text, code = content.split(";")  # Assumes content is split by ";"
+                new_cell_payload = {
+                    "source": "set_next_input",
+                    "text": code,
+                    "replace": False,
+                }
+                ip = get_ipython()
+                ip.payload_manager.write_payload(new_cell_payload)
 
-        if DisplayClass is None:
-            return output
-        if display_format == "json":
-            # JSON display expects a dict, not a JSON string
-            output = json.loads(output)
-        output_display = DisplayClass(output, metadata=md)
+                if text:
+                    # If there's text to display before the code, display it as markdown
+                    return DisplayClass(text, metadata=md)
+                else:
+                    # If there's no text, no need to return a display object
+                    return None
+            else:
+                # For non-code formats (e.g., markdown), display normally
+                if DisplayClass is not None:
+                    return DisplayClass(content, metadata=md)
+                else:
+                    # Handle the case where the display class is not found
+                    print("Unsupported display format:", display_format)
+        else:
+            # If not hardcoded, fall back to the original or alternative logic
+            pass
 
-        # finally, display output display
-        return output_display
     
     @line_cell_magic
     def biome(self, line, cell=None):
